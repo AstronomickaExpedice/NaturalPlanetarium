@@ -1,5 +1,5 @@
 //PLANETARIUM
-$fn=50;
+$fn=100;
 
 //SROUBY M3
 M3_screw_lenght=10;           //delka sroubu
@@ -35,8 +35,7 @@ h_Loz=5;               //vyska loziska
 //Laser
 a_Laser=42;         //sirka Laseru (xy)
 h_Laser=60;         //vyska Laseru
-
-
+Uhlopricka_drzakLaser= sqrt(a_Laser^2 + h_Laser^2);
 
 
 //Tloustka soucastek
@@ -45,6 +44,7 @@ t_AZ=15;            //tloustka AZ casti
 t_ALT=15;            //tloustka ALT casti
 t_podLaser=15;            //tloustka podlozky Laseru
 t_podlozky=3;            //tloustka podlozky AZ/ALT motoru
+t_ulozLaser=3;           //tloustka sten pro ulozeni laseru
 
 //Velke ozubene kolo
 d_Vkolo=50;      //prumer velkeho kola
@@ -64,9 +64,9 @@ H_17ulozeni=h_mot17 + 2*t_podlozky + 2;     //vyska boxu podlozky na motor+toler
 
 
 //ALT cast
-a_ALT=d_Vkolo + a_mot17 + D_Loz;   //sirka (x) ALT casti
+a_ALT=(4/3)*(Uhlopricka_drzakLaser/2 + 10 + a_mot17);   //sirka (x) ALT casti
 b_ALT=h_mot17;   //delka (y) ALT casti
-h_ALT=h_Laser;                         //vyska (z) ALT casti
+h_ALT=Uhlopricka_drzakLaser+10;                         //vyska (z) ALT casti
 
 
 //OSY M5
@@ -88,23 +88,24 @@ h_podLaser=h_Laser + 10;        //vyska drzaku Laseru + uchyt sroubu
 */
 
 
-
-
-
-
-
-
+//AZ cast hodnoty
+A=70;
+D=A;
+/*V=A*1.5;
+B=D+V;
+E=A/2+D/2;       //posun na rovnou hranu
+F=A+D/2 ;        //posun k zaoblene casti   */
+Teziste=D/6;       //posun ze stredu do teziste trojuhelniku
 
 Posun_perspektivy=0;               //osa z 
 Posun_ALT=30;                       //osa z
 
 Posun_AZmot= sqrt(a_ALT^2 + b_ALT^2);  //polomer nutny pro otoceni ALT casti
-Uhlopricka_drzakLaser= sqrt(a_Laser^2 + h_Laser^2);
 Posun_drzakLaser= Posun_ALT + Uhlopricka_drzakLaser/2 + t_ALT/2 + 5;
 Posun_podLaser=5;
 PosunALT_Vkolo=5;
 
-
+a_AZkol=Posun_AZmot/2+a_mot17/2 +10;        //vzdalenost osy AZ a stredu motoru AZ
 
 Hloubka_loziskaAZ= t_AZ/2 - h_Loz/2 + 0.1;
 Hloubka_loziskaALT= t_ALT/2 - h_Loz/2 + 0.1;
@@ -114,22 +115,41 @@ Hloubka_loziskaLaser= t_ALT/2 - h_Loz/2 + 0.1;
 
 
 
-module AZ() {    
 
-    cylinder(r=(4/3)*a_AZ*1.5, h=t_AZ, $fn=3, center=true);
+module AZ() { 
+    translate([Teziste + a_AZkol/6,0,0])    //priblizny posun do centra podlozky i s uvahou teziste soustavy
+/*  translate([a_AZkol/6,0,0])    //posun do teziste cele soustavy pri pomeru 1:2 */
+    hull() {
+        for(rot=[1:3])
+            rotate([rot*120,90,0])
+                translate([0,0,A])
+                    rotate([0,90,0])
+                        cylinder(d=D,h=t_AZ, center=true);
+    }   
     color("Red")
     cylinder(d=prumer_os, h=Posun_ALT*2 + 30, center=true);
-
 }
+
 
 module motor() {
     color("OrangeRed") {
-    cube([a_mot17,a_mot17,h_mot17], center=true);
+    cube([a_mot17,a_mot17,h_mot17], center=true);   //telo motoru
         translate([0,0, h_mot17/2]) {
-            cylinder(d=d_tyc17, h=h_tyc17);
-            cylinder(d=d_pod17, h=h_pod17);
+            cylinder(d=d_tyc17, h=h_tyc17);         //tyc motoru
+            cylinder(d=d_pod17, h=h_pod17);         //podlozka u tyce
         }
-    }
+    }         
+    color("Orange")                             //otvory na srouby
+    translate([0,0,-h_mot17/2+h_otvor17/2-0.1])
+        for(rot=[1:4])
+            rotate([rot*90+45,90,0])
+                translate([0,0,a_rozvor17/2*sqrt(2)])
+                    rotate([0,90,0])
+                        cylinder(d=d_otvor17,h=h_otvor17, center=true);
+}
+
+module ulozeni_motoru() {
+    cube([a_mot17+t_ulozLaser*2,a_mot17+t_ulozLaser*2,h_mot17+t_ulozLaser], center=true);
 }
 
 module lozisko() {
@@ -138,23 +158,35 @@ module lozisko() {
 }  
 
 module Vkolo() {
-    color("LightBlue")
+    color("Lime")
     cylinder(d=d_Vkolo,h=t_kolo, center=true);
 }
 
 module Mkolo() {
-    color("LightBlue")
+    color("Lime")
     cylinder(d=d_Mkolo,h=t_kolo, center=true);
 }
 
 
 module ALT() {
-    cube([a_ALT,b_ALT,t_ALT], center=true);
+    color("DeepSkyBlue")                    
+    cube([a_ALT,b_ALT,t_ALT], center=true);     //vodorvna cast
+    color("DeepSkyBlue")                    
     translate([a_ALT/4, -b_ALT/2+t_ALT/2, h_ALT/2 + t_ALT/2])
-        rotate([0,0,90])
-        color("Salmon")
-        cube([t_ALT,a_ALT/2,h_ALT], center=true); 
-    
+        rotate([0,0,90]) {
+            difference() {
+                cube([t_ALT,a_ALT/2,h_ALT], center=true);       //svisla cast
+                rotate([0,90,0])
+                    translate([h_ALT/2 - Posun_drzakLaser/2,0,0])
+                    difference() {                            //uprava zaoblene casti
+                        cylinder(d=a_ALT/2+50,h=t_ALT+0.2, center=true);
+                        cylinder(d=a_ALT/2,h=t_ALT+0.2, center=true);
+                        rotate([0,90,0])
+                            translate([0,0,h_ALT/2])
+                                cube([t_ALT,a_ALT/2,h_ALT], center=true);
+            }
+        }
+        }
 }
 
 module drzak_Laseru() {
@@ -163,7 +195,7 @@ module drzak_Laseru() {
 }
 
 module Laser() {
-    color("Grey")
+    color("LightSalmon")
     cube([a_Laser,a_Laser,h_Laser], center=true);
 }
 
@@ -184,7 +216,7 @@ translate([0,0,0]) {
 }
 
 //AZ motor
-translate([Posun_AZmot/2+a_mot17/2 +10, 0, t_AZ + Posun_perspektivy])
+translate([a_AZkol, 0, t_AZ + Posun_perspektivy])
     rotate([0,180,0])
         union() {
             translate([0,0, -H_mot17/2 - t_AZ/3])
@@ -279,20 +311,25 @@ h_ALTosa=t_kolo + t_ALT + t_podLaser + mezera_ALTosy*3;
 
 
 //KONTROLY
-color("Pink")
+/*color("Pink")
 translate([0,0,Posun_ALT])
-cylinder(d=Posun_AZmot,h=1);
+cylinder(d=Posun_AZmot,h=1);*/
 
-echo("Musi byt kladne. Tloustka AZ casti v mezere AZ osy =", t_AZ-2*h_Loz);
-echo("Musi byt kladne. Tloustka ALT casti v mezere AZ/ALT osy =", t_ALT-2*h_Loz);
-echo("Musi byt kladne. Tloustka drzaku Laseruv mezere ALT osy =", t_podLaser-2*h_Loz);
+echo("Musi byt kladne. Otaceni laseru kvuli AZmot =",Posun_AZmot/2 - (a_ALT/4+Uhlopricka_drzakLaser/2));    //pokud bude zaporne, nutno preparametrizovat vzdalenost AZ motoru od ALT casti
+
+echo("Musi byt kladne, MIN = 5. Tloustka AZ casti v mezere AZ osy =", t_AZ-2*h_Loz);
+echo("Musi byt kladne, MIN = 5. Tloustka ALT casti v mezere AZ/ALT osy =", t_ALT-2*h_Loz);
+echo("Musi byt kladne, MIN = 5. Tloustka drzaku Laseruv mezere ALT osy =", t_podLaser-2*h_Loz);
 echo(Posun_AZmot/2 -(a_ALT/4+h_Laser/2));
+echo(sqrt(3));
 
-/* Zkontrolovat rotaci drzaku laseru + upravit konstanty
-translate([a_ALT/4,0,Posun_drzakLaser]) {
+// Zkontrolovat rotaci drzaku laseru + upravit konstanty
+/*translate([a_ALT/4,0,Posun_drzakLaser]) {
 rotate([0,45,0])
     drzak_Laseru();
+    rotate([90,0,0])
+    cylinder(d=73, h=1);
+}
 */
-
 
 
