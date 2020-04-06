@@ -149,9 +149,9 @@ Teziste=D/6;       //posun ze stredu do teziste trojuhelniku
 {
 //tyto posuny jsou pouze kvuli prohlizeni modelu jako celku
 Posun_perspektivy=0;               //osa z 
-Posun_ALT=30;                       //osa z
+Posun_ALT=50;                       //osa z
 Posun_perspektivy_motor=50;
-Posun_AZkol=0;
+Posun_AZkol=-20;
 
 //Posuny jednotlivych casti kvuli podminkam otaceni, velikosti,...
 Posun_AZmot= sqrt(a_ALT^2 + b_ALT^2);  //polomer nutny pro otoceni ALT casti
@@ -433,6 +433,10 @@ module lozisko() {
     cylinder(d=D_Loz,h=h_Loz, center=true);
 }  
 
+//Ulozeni loziska
+module ulozeni_loziska() {
+    cylinder(d1=D_Loz*2,d2=D_Loz,h=h_Loz*2, center=true);
+}
 
 
 //VELKE KOLO
@@ -500,6 +504,11 @@ translate([0,0,0]) {
     rotate([180,0,0])
         translate([0,0, Hloubka_loziskaAZ])
             lozisko();
+    rotate([180,0,0])
+        translate([0,0, Hloubka_loziskaAZ + 10])
+                ulozeni_loziska();
+    translate([0,0, Hloubka_loziskaAZ + 10])
+            ulozeni_loziska();
 }
 
 //AZ MOTOR + KOLA
