@@ -311,12 +311,16 @@ module ulozeni_motoru() {
     difference() {
         union() {
             cube([a_mot17+t_ulozLaser*2,a_mot17+t_ulozLaser*2,h_mot17+t_ulozLaser], center=true);
-        translate([0,0,h_mot17/2+t_ulozLaser/2-h_otvor_sroub/2])
+        translate([0,0,h_mot17/2+t_ulozLaser/2-(delka_sroubu+4)/2])
         for(rot=[1:4])
             rotate([rot*90+45,90,0])
                 translate([0,0, a_mot17/2 * sqrt(2) + t_ulozLaser*1.5])
                     rotate([0,90,0])
-                        cylinder(d=M3_screw_diameter*3,h=h_otvor_sroub, center=true);
+                        hull() {
+                        cylinder(d=M3_screw_diameter*3,h=delka_sroubu+4, center=true);
+                        translate([2,0,20])
+                            cylinder(d=2.5,h=1, center=true);
+                            }
         translate([0,0,-h_mot17/2-t_ulozLaser/2])
         for(rot=[1:4])
             rotate([rot*90+45,90,0])
@@ -328,14 +332,28 @@ module ulozeni_motoru() {
         translate([0,0,t_ulozLaser+0.1])
             cube([a_mot17+tol_sten,a_mot17+tol_sten,h_mot17+t_ulozLaser*2], center=true);
         
-        translate([0,0,h_mot17/2+t_ulozLaser/2-h_otvor_sroub/2])
+        translate([0,0,h_mot17/2+t_ulozLaser/2-h_otvor_sroub/2]) {
         for(rot=[1:4])
             rotate([rot*90+45,90,0])
-                translate([0,0, a_mot17/2 * sqrt(2) + t_ulozLaser*1.5])
-                    rotate([0,90,0])
-                        cylinder(d=M3_screw_diameter,h=h_otvor_sroub*3+0.2, center=true);
+                translate([1.5,0, a_mot17/2 * sqrt(2) + t_ulozLaser*1.5])
+                    rotate([0,90,180])
+                        #union() {
+                        
+                      //SROUB, MATKA, ULOZENI MATKY
+                                     
+                         hull() {
+                         cylinder(d=M3_nut_diameter,h=M3_nut_height,$fn=6, center=true);
+                         translate([-5,0,0])
+                         cylinder(d=M3_nut_diameter,h=M3_nut_height,$fn=6, center=true);
+                         }
+                         cylinder(d=M3_screw_diameter,h=delka_sroubu+7, center=true);            //telo sroubu
+                         translate([0,0,(delka_sroubu+7)/2])
+                            cylinder(d=M3_screw_head_diameter,h=M3_screw_head_height);        //hlavy sroubu
+                                 
+                     }
+                 }
         //odecteni podlozky a tyce
-        #rotate([0,180,0])
+        rotate([0,180,0])
         translate([0,0, h_mot17/2-h_pod17/2]) {                  
             cylinder(d=d_tyc17, h=h_tyc17);         //tyc motoru
             cylinder(d=d_pod17, h=h_pod17*2);         //podlozka u tyce
@@ -496,6 +514,8 @@ module soustavaAZ_motorKola() {
         }
         translate([0,0,H_mot17/2-tol_sten-0.1])
         ulozeni_motoru();
+        translate([0,0,H_mot17-9.6])
+        ulozeni_motoru_vicko();
     
 translate([-a_AZkol,0, -Posun_AZkol])
     Vkolo();
