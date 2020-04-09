@@ -804,6 +804,8 @@ echo("Musi byt kladne, MIN = 5. Tloustka ALT casti v mezere AZ/ALT osy =", t_ALT
 echo("Musi byt kladne, MIN = 5. Tloustka drzaku Laseruv mezere ALT osy =", t_podLaser-2*h_Loz);
 echo(Posun_AZmot/2 -(a_ALT/4+h_Laser/2));
 echo(sqrt(29)*(33/29));
+echo("vzdalenost AZ motor a AZ osa", Posun_AZmot/2+a_mot17/2);
+echo(Posun_AZmot/2+a_mot17);
 }
 
 // Zkontrolovat rotaci drzaku laseru + upravit konstanty
