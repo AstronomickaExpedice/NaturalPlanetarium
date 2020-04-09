@@ -169,7 +169,7 @@ h_podLaser=h_Laser + 10;        //vyska drzaku Laseru + uchyt sroubu
 //AZ cast hodnoty
 {
 //cela AZ podlozka navrzena funkci hull    
-A=25;               //vzdalenost od stredu kruhu tvoricich AZ cast
+A=a_mot17*(11/36);               //vzdalenost od stredu kruhu tvoricich AZ cast
 D=A;                //prumer kruhu tvoricich AZ cast
 /*V=A*1.5;
 B=D+V;
@@ -297,6 +297,8 @@ module AZ_podlozka() {
                         cylinder(d=D,h=t_AZ, center=true);
         }
 }
+
+
     
 //AZ podlozka
 module AZ() {
@@ -306,6 +308,55 @@ module AZ() {
                 translate([a_AZkol/6,0,0]) {   //posun do teziste cele soustavy pri pomeru hmotnosti 1:2 
   */                
             translate([0,0,50])
+            scale([1.5,1.5,1])
+            color("LightBlue")
+            AZ_podlozka();
+                    translate([0,0,0])
+                    for(rot=[1:3])
+                        rotate([rot*120,90,180])    
+                            translate([0,0,-2.5*D/3])   //posun tri dilu do stredu
+                                rotate([0,90,0]) {
+                                   hull() {
+                                    rotate([0,180,0])   //vzajemne otoceni trojuhelniku...
+                                        translate([0,0,0])
+                                            scale([1.2*(1/3),1.2,1])
+                                                AZ_podlozka();
+                                    translate([Posun_AZmot/2+a_mot17/2+D*1.7,0,0])
+                                            scale([1.2*(1/3),1.2,1])
+                                           AZ_podlozka();
+                                          // #cylinder(d=a_mot17,h=t_AZ, center=true);
+                                   }
+                                }
+/*    //nozicky
+       
+                    Vnohy();
+                    translate([0,0,-h_Vnohy*(1/2)])
+                        Mnohy();*/
+  /*                  } 
+                }*/
+
+    
+            }
+    color("Red")
+        cylinder(d=M5_screw_diameter, h=Posun_ALT*2 + 30, center=true);
+    color("Grey")
+    translate([a_AZkol, 0, 0]) 
+        cylinder(d=d_tyc17*2, h=t_AZ*1.1, center=true);
+
+
+
+        }
+}
+
+/*
+//AZ podlozka
+module AZ() {
+    difference() {          //REZ AZ NOHAMI
+        union() {
+  /*          translate([Teziste + a_AZkol/6,0,0]) {      //priblizny posun do centra podlozky i s uvahou teziste soustavy
+                translate([a_AZkol/6,0,0]) {   //posun do teziste cele soustavy pri pomeru hmotnosti 1:2 
+  */                
+ /*           translate([0,0,50])
             scale([1.5,1.5,1])
             color("LightBlue")
             AZ_podlozka();
@@ -332,7 +383,7 @@ module AZ() {
   /*                  } 
                 }*/
 
-    
+ /*   
             }
     color("Red")
         cylinder(d=M5_screw_diameter, h=Posun_ALT*2 + 30, center=true);
@@ -344,6 +395,9 @@ module AZ() {
 
         }
 }
+*/
+
+
 
 //MOTOR
 module motor() {
