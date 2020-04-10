@@ -701,10 +701,12 @@ translate([a_ALT/4, -b_ALT/2+t_ALT/2, Posun_drzakLaser]) {
    }
 
 //ALT motor
- translate([0 ,0, 0]){
+ translate([0 ,0,  ]){
     rotate([90,0,0])
-     translate([-a_ALT/2 + a_mot17/2 ,Posun_ALT + a_mot17/2 + t_ALT/2, 0])
+     translate([-a_ALT/2 + a_mot17/2 ,Posun_ALT + a_mot17/2 + t_ALT/2 , 0])
         union() {
+            rotate([0,90,0])
+            translate([0,Posun_drzakLaser/2-a_mot17/2,0])
             motor();
 
             translate([0,0, b_ALT/2 + PosunALT_Vkolo + mezera_ALTosy/2])
@@ -726,7 +728,9 @@ rotate([90,0,0])
 
 
 //LASER
-translate([a_ALT/4, -b_ALT/2 + t_ALT + mezera_ALTosy + t_podLaser/2,Posun_drzakLaser]) {
+
+translate([0, -b_ALT/2 + t_ALT + mezera_ALTosy + t_podLaser/2,Posun_drzakLaser]) {
+rotate([0,0,90]){
 drzak_Laseru();
 /*Loziska drzak Laseru
 translate([0, 0, 0]) {
@@ -746,13 +750,12 @@ translate([0, 0, 0]) {
        }   
    }   
 */
-
+rotate([0,0,180])
 translate([0,a_Laser/2 + t_podLaser/2 + mezera_ALTosy/2 ,0])
 Laser();
 }
 
-
-
+}
 
 
 
