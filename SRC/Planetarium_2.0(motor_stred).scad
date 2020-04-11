@@ -38,6 +38,9 @@ tol_h_sroub17=2;
 tol_h_sroub=2;
 tol_h_sroubLaser=2;
 tol_h_sroubAZosa=2;
+tol_h_drzakLaser=10;
+tol_b_pod17=15;
+tol_a_pod17=15;
 }
 
 //SROUBY M3
@@ -58,7 +61,7 @@ h_otvor_sroub=8;           //delka otvoru pro sroub
 {
 //BOKORYS
 
-h_mot17=45;             //vyska hlavni casti motoru (muze byt v hodnotach 34-48mm nebo 60mm)
+h_mot17=60;             //vyska hlavni casti motoru (muze byt v hodnotach 34-48mm nebo 60mm)
 h_tyc17=24.0;           //vyska stredove tyc (podlozka+tyc), tolerance 1mm
 d_tyc17=5.0;           //prumer stredove tyc, tolerance 0.012mm
 d_pod17=22.0;          //prumer podlozky stredove tyc, tolerance 0.05mm
@@ -121,6 +124,7 @@ d_Mnohy=d_Vnohy-t_Vnohy-tol_nohy; //prumer vnitrnich nohou
     
 d_podMnohy=d_Vnohy+10;      //vyska podlozky vnitrnich nohou
 h_podMnohy=3;               //prumer podlozky vnitrnich nohou
+
 }
 
 //Podlozka AZ/ALT NEMA17
@@ -132,9 +136,20 @@ H_17ulozeni=h_mot17 + 2*t_podlozky + 2;     //vyska boxu podlozky na motor+toler
 
 //ALT cast
 {
-a_ALT=(4/3)*(Uhlopricka_drzakLaser/2 + 10 + a_mot17);   //sirka (x) ALT casti
-b_ALT=h_mot17;   //delka (y) ALT casti
+mezera_ALTosy=h_Loz*2.5;        //toutou konstantou dochazi k posunu soucastek upevnenych na ALT ose
+
+a_ALT=h_mot17 + mezera_ALTosy*2 + a_Laser + t_podLaser + tol_a_pod17;   //sirka (x) ALT casti
+b_ALT=a_mot17 + tol_b_pod17;   //delka (y) ALT casti
 h_ALT=Uhlopricka_drzakLaser+10;                         //vyska (z) ALT casti
+}
+
+//ALT podlozka motoru
+{
+a_ALTpod17 = h_mot17 + tol_b_pod17;
+b_ALTpod17 = a_mot17 + tol_b_pod17;
+t_ALTpod17 = 5; 
+h_ALTpod17 = Uhlopricka_drzakLaser/2 + tol_h_drzakLaser - a_mot17/2;
+   
 }
 
 //OSY M5
@@ -162,35 +177,39 @@ h_podLaser=h_Laser + 10;        //vyska drzaku Laseru + uchyt sroubu
 
 //AZ cast hodnoty
 {
-//cela AZ podlozka navrzena funkci hull    
-A=70;               //vzdalenost od stredu kruhu tvoricich AZ cast
+//cela AZ cast navrzena funkci hull    
+A=a_mot17*0.4;               //vzdalenost od stredu kruhu tvoricich AZ cast
 D=A;                //prumer kruhu tvoricich AZ cast
 /*V=A*1.5;
 B=D+V;
 E=A/2+D/2;       //posun na rovnou hranu
 F=A+D/2 ;        //posun k zaoblene casti   */
 Teziste=D/6;       //posun ze stredu do teziste trojuhelniku
+Prodlouzeni_AZ=5*D;             //vzdalenost od stredu trojuhelniku tvoricich spodni dily
 }
 //POSUNY
 {
 //tyto posuny jsou pouze kvuli prohlizeni modelu jako celku
 Posun_perspektivy=0;               //osa z 
-Posun_ALT=60;                       //osa z
+Posun_ALT=70;                       //osa z
 Posun_perspektivy_motor=50;
 Posun_AZkol=20;
 
 //Posuny jednotlivych casti kvuli podminkam otaceni, velikosti,...
 Posun_AZmot= sqrt(a_ALT^2 + b_ALT^2);  //polomer nutny pro otoceni ALT casti
-Posun_drzakLaser= Posun_ALT + Uhlopricka_drzakLaser/2 + t_ALT/2 + 5;
+Posun_drzakLaser= Posun_ALT + Uhlopricka_drzakLaser/2 + t_ALT/2 + tol_h_drzakLaser;
 Posun_podLaser=5;
 PosunALT_Vkolo=10;
 posun_matkaLaser=1.5;
+Posun_nohou=A+D/6+Prodlouzeni_AZ;    
+    
+U_a_pod17=a_ALTpod17/2 - tol_a_pod17/3;     //Vzdalenost nohou podlozky Laseru ve smeru a
+U_b_pod17=b_ALTpod17/2 - tol_b_pod17/3;     //Vzdalenost nohou podlozky Laseru ve smeru b
 
 a_AZkol=Posun_AZmot/2+a_mot17/2 +10;        //vzdalenost osy AZ a stredu motoru AZ
     
 D_ulozAZ_Loz=D_Loz*3;
 h_ulozLoz=h_Loz*2;
-mezera_ALTosy=h_Loz*2.5;        //toutou konstantou dochazi k posunu soucastek upevnenych na ALT ose
 }
 
 //HLOUBKY LOZISEK
@@ -237,7 +256,7 @@ module Vnohy() {    //vnejsi cast nozicek u AZ casti (pro tisk spojeno s AZ cast
     color("OrangeRed")
     for(rot=[1:3])
             rotate([rot*120,90,0])
-                translate([h_Vnohy/2+t_AZ/2,0,A+D/6])
+                translate([h_Vnohy/2+t_AZ/2,0,Posun_nohou])
                     rotate([0,90,0])
                         difference() {
                             hull() {
@@ -273,7 +292,7 @@ module Mnohy() {
     color("Orange")
     for(rot=[1:3])
             rotate([rot*120,90,0])
-                translate([h_Vnohy/2+t_AZ/2,0,A+D/6])
+                translate([h_Vnohy/2+t_AZ/2,0,Posun_nohou])
                     rotate([0,90,0]) {
                         cylinder(d=d_Mnohy,h=h_Mnohy, center=true);
                         translate([0,0,h_Mnohy/2+h_podMnohy/2])
@@ -281,8 +300,8 @@ module Mnohy() {
                     }
 }
 
-//AZ podlozka
-module AZ_podlozka() {
+//AZ cast
+module AZ_cast() {
     hull() {
         for(rot=[1:3])
             rotate([rot*120,90,0])
@@ -292,33 +311,45 @@ module AZ_podlozka() {
         }
 }
     
-//AZ podlozka
 module AZ() {
-    difference() {          //REZ AZ NOHAMI
+//    difference() {          //REZ AZ NOHAMI
         union() {
-        //    translate([Teziste + a_AZkol/6,0,0]) {      //priblizny posun do centra podlozky i s uvahou teziste soustavy
-          //      translate([a_AZkol/6,0,0]) {   //posun do teziste cele soustavy pri pomeru hmotnosti 1:2 
-                    AZ_podlozka();
+  /*          translate([Teziste + a_AZkol/6,0,0]) {      //priblizny posun do centra podlozky i s uvahou teziste soustavy
+                translate([a_AZkol/6,0,0]) {   //posun do teziste cele soustavy pri pomeru hmotnosti 1:2 
+  */                
+            translate([0,0,t_AZ*1])
+            scale([2,2,1])
+            color("LightBlue")
+            AZ_cast();
+            translate([0,0,0])
+            for(rot=[1:3])
+                rotate([rot*120,90,180])    
+                    translate([0,0,-2.5*D/3])   //posun tri dilu do stredu
+                        rotate([0,90,0]) {
+                           hull() {
+                            rotate([0,180,0])   //vzajemne otoceni trojuhelniku...
+                                translate([0,0,0])
+                                    scale([1.2*(1/3),1.2,1])
+                                        AZ_cast();
+                            translate([Prodlouzeni_AZ,0,0])
+                                    scale([1,1.2,1])
+                                   AZ_cast();
+                                  // #cylinder(d=a_mot17,h=t_AZ, center=true);
+                           }
+                        }
+   //nozicky
+           
+                Vnohy();
+                translate([0,0,-h_Vnohy*(1/2)])
+                    Mnohy();
+                       } 
     
-    //nozicky
-       
-                    Vnohy();
-                    translate([0,0,-h_Vnohy*(1/2)])
-                        Mnohy();
-            //        } 
-          //      }
-
-    
-            }
-    color("Red")
-        cylinder(d=M5_screw_diameter, h=Posun_ALT*2 + 30, center=true);
-    color("Grey")
-    translate([a_AZkol, 0, 0]) 
-        cylinder(d=d_tyc17*2, h=t_AZ*1.1, center=true);
-
-
-
-        }
+//    color("Red")
+//        cylinder(d=M5_screw_diameter, h=Posun_ALT*2 + 30, center=true);
+ //   color("Grey")
+ //   translate([a_AZkol, 0, 0]) 
+ //       cylinder(d=d_tyc17*2, h=t_AZ*1.1, center=true);
+ //       }
 }
 
 //MOTOR
@@ -331,7 +362,7 @@ module motor() {
         }
     }         
     color("Orange")                             //otvory na srouby
-    translate([0,0,-h_mot17/2+h_otvor17/2-0.1])
+    translate([0,0,+h_mot17/2-h_otvor17/2+0.1])
         for(rot=[1:4])
             rotate([rot*90+45,90,0])
                 translate([0,0,a_rozvor17/2*sqrt(2)])
@@ -339,6 +370,32 @@ module motor() {
                         cylinder(d=d_otvor17,h=h_otvor17, center=true);
 }
 
+module pod_ALTmotor() {
+    
+    cube([a_ALTpod17, b_ALTpod17, t_ALTpod17], center=true);
+    for(rot=[1:2])
+        for(i=[1:2])
+            rotate([0,0,rot*180])
+                translate([U_a_pod17*(-1)^i, U_b_pod17, h_ALTpod17/2 ])
+                    rotate([0,0,0]) {
+                        translate([0,0,0]) {
+                            cylinder(d=M3_screw_diameter*2.5, h=h_ALTpod17, center=true);
+                            
+                           
+                        
+                        }
+         }
+  /*  #for(i=[1:4])
+       
+        rotate([0,0,i*90+45])
+            translate([U_a_pod17*(-1)^i, U_b_pod17*(-1)^i, h_ALTpod17/2])
+                rotate([0,0,0]){
+                
+                
+                cylinder(d=M3_screw_diameter*2.5, h_ALTpod17, center=true);
+                           
+            } */      
+}
 
 /*//MOTOR_ULOZENI
 module ulozeni_motoru() {
@@ -532,16 +589,16 @@ module Mkolo() {
 }
 
 
-//ALT podlozka
+//ALT cast
 module ALT() {
     color("DeepSkyBlue")                    
     cube([a_ALT,b_ALT,t_ALT], center=true);     //vodorvna cast
-    difference() {
+   /* difference() {
         cylinder(d=M5_nut_diameter*2, h=t_ALT + M5_nut_height*2, center=true);
         cylinder(d=M5_nut_diameter, h=t_ALT + M5_nut_height*3, $fn=6, center=true);
         M5_osa();
         }
-    color("DeepSkyBlue")                    
+/*    color("DeepSkyBlue")                    
     translate([a_ALT/4, -b_ALT/2+t_ALT/2, h_ALT/2 + t_ALT/2])
         rotate([0,0,90]) {
             difference() {
@@ -556,7 +613,7 @@ module ALT() {
                                 cube([t_ALT,a_ALT/2,h_ALT], center=true);
                         }
                 }
-            }
+            }*/
 }
 
 module ulozeni_M5() {
@@ -610,7 +667,8 @@ module Laser() {
 
 
 
-//AZ podlozka
+/////////////////////////////////////////////////////////////
+//AZ cast
 AZ();
 /*translate([0,0,0]) {
     translate([0,0, Hloubka_loziskaAZ])
@@ -630,7 +688,7 @@ module soustavaAZ_motorKola() {
 
     rotate([0,0,0])
         union() {
-            translate([-a_AZkol,0, +h_mot17/2-t_AZ/2])
+            translate([-a_AZkol,0, +h_mot17/2+t_AZ/2])
                 motor();
           /*  translate([0,0,Posun_AZkol])
                 Mkolo();   */
@@ -683,7 +741,7 @@ translate([0,0,0]) {
 }
 
 //Loziska ALT/Laser
-translate([a_ALT/4, -b_ALT/2+t_ALT/2, Posun_drzakLaser]) {
+/*translate([a_ALT/4, -b_ALT/2+t_ALT/2, Posun_drzakLaser]) {
         rotate([90,0,0]) {
             translate([0,0, Hloubka_loziskaALT_Laser])
                 lozisko();
@@ -698,38 +756,53 @@ translate([a_ALT/4, -b_ALT/2+t_ALT/2, Posun_drzakLaser]) {
                 translate([0,0, h_ulozLoz/2+t_ALT/2])
                     ulozeni_loziskaAZ_matka();
        }   
-   }
+   }*/
 
 //ALT motor
- translate([0 ,0,  ]){
+ translate([0 ,0, 0 ]){
     rotate([90,0,0])
-     translate([-a_ALT/2 + a_mot17/2 ,Posun_ALT + a_mot17/2 + t_ALT/2 , 0])
-        union() {
-            rotate([0,90,0])
-            translate([0,Posun_drzakLaser/2-a_mot17/2,0])
-            motor();
-
-            translate([0,0, b_ALT/2 + PosunALT_Vkolo + mezera_ALTosy/2])
-                Mkolo();            
-        }
-        
+     translate([-a_ALT/2 + h_mot17/2 + tol_a_pod17/2, 0, 0])
+        difference() {
+            union() {
+                rotate([0,90,0])
+                    translate([0,Posun_drzakLaser,0])
+                        motor();
+               
+                translate([0, Posun_drzakLaser - a_mot17/2 - t_ALTpod17/2, 0])
+                    rotate([90,0,0])
+                        pod_ALTmotor();
+                
+               /* translate([0,0, b_ALT/2 + PosunALT_Vkolo + mezera_ALTosy/2])
+                    Mkolo();   */         
+            }
+            
+            translate([0,Posun_ALT,0])
+            rotate([-90,0,0]) 
+                for(rot=[1:2]) 
+                    for(i=[1:2])
+                        rotate([0,0,rot*180])
+                        translate([U_a_pod17*(-1)^i, U_b_pod17, h_ALTpod17/2 ]){
+                        
+                            translate([0,0,-14])
+                                sroubek(delka=35);
+                            cylinder(d=M3_screw_diameter, h=h_ALTpod17*2, center=true);
+                        }
+                        
+}
 //ALT VELKE KOLO
-rotate([90,0,0])
+/*rotate([90,0,0])
     translate([a_ALT/4, Posun_drzakLaser , b_ALT/2 + PosunALT_Vkolo + mezera_ALTosy/2]) 
         difference() {
         Vkolo(); 
         color("Red")            //ALT osa
         translate([0, 0, -mezera_ALTosy*1.5])
             cylinder(d=M5_screw_diameter, h= 55, center=true); 
-    } 
+    } */
 
 }
 
-
-
 //LASER
-
-translate([0, -b_ALT/2 + t_ALT + mezera_ALTosy + t_podLaser/2,Posun_drzakLaser]) {
+translate([a_ALT/10, 0,Posun_drzakLaser]) {
 rotate([0,0,90]){
 drzak_Laseru();
 /*Loziska drzak Laseru
@@ -751,7 +824,7 @@ translate([0, 0, 0]) {
    }   
 */
 rotate([0,0,180])
-translate([0,a_Laser/2 + t_podLaser/2 + mezera_ALTosy/2 ,0])
+translate([0,a_ALT*(1/4) ,0])
 Laser();
 }
 
@@ -811,13 +884,13 @@ echo("vzdalenost AZ motor a AZ osa", Posun_AZmot/2+a_mot17/2);
 echo(Posun_AZmot/2+a_mot17);
 }
 
-// Zkontrolovat rotaci drzaku laseru + upravit konstanty
-/*translate([a_ALT/4,0,Posun_drzakLaser]) {
-rotate([0,45,0])
-    drzak_Laseru();
-    rotate([90,0,0])
-    cylinder(d=73, h=1);
+/*/ Zkontrolovat rotaci drzaku laseru + upravit konstanty
+translate([a_ALT/4,0,Posun_drzakLaser]) {
+rotate([0,0,0])
+   // drzak_Laseru();
+    rotate([0,90,0])
+    cylinder(d=Uhlopricka_drzakLaser, h=1);
 }
-*/
 
+*/
 
