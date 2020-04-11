@@ -3,12 +3,12 @@ $fn=100;
 
 /* DALSI UPRAVY
     OTVORY OS
-    OZUBENA KOLA
-    PODLOZKA MOTOR AZ/ALT
+X    OZUBENA KOLA   
+OK    PODLOZKA MOTOR AZ/ALT
     PODLOZKA LASER
-    ULOZENI LOZISEK - DO JEDNOHO module
-    DIRY V PODLOZCE
-    ALT - BOCNICE + ZEBRO
+x    ULOZENI LOZISEK - DO JEDNOHO module
+OK    DIRY V PODLOZCE
+X    ALT - BOCNICE + ZEBRO
     ZKONTROLOVAT PARAMETRY
 
 */
@@ -230,8 +230,8 @@ Hloubka_loziskaALT_Laser= t_ALT/2 + h_Loz/2 + 0.1;  //ALT osa, ALT cast
 
 
 
-//sroubekM3
-module sroubekM3(delka = 10){
+//sroubek_M3
+module sroubek_M3(delka = 10){
    
     translate([0, 0, -M3_screw_head_height]) 
     cylinder(d = M3_screw_head_diameter, h = M3_screw_head_height);         //hlava sroubu
@@ -240,8 +240,8 @@ module sroubekM3(delka = 10){
 }
 
 
-//sroubekM5
-module sroubekM5(delka = 20){
+//sroubek_M5
+module sroubek_M5(delka = 20){
    
     translate([0, 0, -M5_head_height]) 
     cylinder(d = M5_head_diameter, h = M5_head_height);    //hlava sroubu
@@ -352,12 +352,7 @@ module AZ() {
                     translate([0,0,-t_AZ])
                         AZ_cast();
                     }
-          //  translate([0,0,10]){
-          //      scale([1.2,1.2,1])
-            //        AZ_cast();
-                  //  translate([0,0,30])
-                 //   motor();
-            //}  
+            
 //PRODLOUZENE CASTI                    
             for(rot=[1:3])
                 rotate([rot*120,90,180])    
@@ -380,16 +375,34 @@ module AZ() {
                 translate([0,0,-h_Vnohy*(1/2)])
                     Mnohy();
                        }
-//OTVORY SROUBY A MATKY
-        #for(rot_i=[1:3])
+//OTVORY SROUBY A MATKY (M5)
+        for(rot_i=[1:3])
+            for(rot_j=[1:2])
+                rotate([rot_i*120+(rot_j*30+15)+60,270,0])    
+                    translate([t_AZ,0,-D*2.2+0.5])   
+                        rotate([180,90,0]) {
+                            sroubek_M5(30);
+                            translate([0,0,t_AZ*2.5]) 
+                                matka_M5();
+                           }
+
+//OTVORY SROUBY MOTOR (M3)
+        for(rot_i=[1:3])
             for(rot_j=[1:2])
                 rotate([rot_i*120+(rot_j*30+15)+60,270,0])    
                     translate([t_AZ,0,-D*2.2])   
                         rotate([180,90,0]) {
-                            sroubekM5(30);
+                            sroubek_M5(30);
                             translate([0,0,t_AZ*2.5]) 
-                                matka_M5();
-                           }
+                                matka_M3();
+                           } 
+        translate([0,0,-t_AZ*1.25])
+        for(rot=[1:4])
+            rotate([rot*90+45,270,0])
+                translate([0,0,a_rozvor17/2*sqrt(2)])
+                    rotate([0,90,0])
+                        sroubek_M3(30);                  
+                           
 /*      
         color("Red")
         cylinder(d=M5_screw_diameter, h=Posun_ALT*2 + 30, center=true);
@@ -415,6 +428,13 @@ module motor() {
                 translate([0,0,a_rozvor17/2*sqrt(2)])
                     rotate([0,90,0])
                         cylinder(d=d_otvor17,h=h_otvor17, center=true);
+    color("Orange")                             //otvory na srouby
+    translate([0,0,-h_mot17/2+h_otvor17/2+0.1])
+        for(rot=[1:4])
+            rotate([rot*90+45,90,0])
+                translate([0,0,a_rozvor17/2*sqrt(2)])
+                    rotate([0,90,0])
+                        cylinder(d=d_otvor17,h=h_otvor17, center=true);
 }
 
 //PODLOZKA MOTORU
@@ -430,7 +450,7 @@ module pod_ALTmotor() {
                             rotate([rot*90+45,0,0])
                                 translate([0,0,a_rozvor17/2*sqrt(2)])
                                     rotate([0,90,180])
-                                        sroubekM3();    //otvory sroubu (svisla cast)
+                                        sroubek_M3();    //otvory sroubu (svisla cast)
                     }
             
 //NOHY PODLOZKY 
@@ -456,7 +476,7 @@ module pod_ALTmotor() {
                         rotate([0,0,rot*180])
                             translate([U_a_pod17*(-1)^i, U_b_pod17, h_ALTpod17/2 ]){
                                 translate([0,0,-h_ALTpod17/2 - t_ALT/2 +1])
-                                    sroubekM3(delka=35);
+                                    sroubek_M3(delka=35);
                                 translate([0,0,h_ALTpod17/2 + t_ALTpod17/2])
                                     hull() {
                                         matka_M3();
@@ -580,7 +600,7 @@ translate([200,0,0]) {
             rotate([rot*90+45,90,0])
                 translate([0,0, a_mot17/2 * sqrt(2) + t_ulozLaser*1.5])
                     rotate([0,90,0]) {
-                        sroubekM3(16);
+                        sroubek_M3(16);
                         translate([0,0,16-M3_nut_height-1])
                         matka_M3();
                     }
@@ -676,7 +696,7 @@ module ALT() {
                         translate([U_a_pod17*(-1)^i, U_b_pod17, h_ALTpod17/2 ]){
                         
                             translate([0,0,-h_ALTpod17/2 - t_ALT/2 +1])
-                                sroubekM3(delka=40);
+                                sroubek_M3(delka=40);
                            
                         }
                     }
