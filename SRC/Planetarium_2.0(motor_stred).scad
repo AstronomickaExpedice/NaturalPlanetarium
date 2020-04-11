@@ -14,10 +14,12 @@ $fn=100;
 */
 
 //DELKY SROUBU
+{
 delka_sroubuLoz=16;
 delka_sroubu_Vnohy=10;
 delka_sroubu_podLaser=10;
 delka_sroubu=10;   
+}
 
 /* pred tiskem celeho modelu
 1) vytisknout AZ nohu (pomery vnitrni vnejsi noha; ulozeni sroubu)
@@ -61,7 +63,7 @@ h_otvor_sroub=8;           //delka otvoru pro sroub
 {
 //BOKORYS
 
-h_mot17=60;             //vyska hlavni casti motoru (muze byt v hodnotach 34-48mm nebo 60mm)
+h_mot17=45;             //vyska hlavni casti motoru (muze byt v hodnotach 34-48mm nebo 60mm)
 h_tyc17=24.0;           //vyska stredove tyc (podlozka+tyc), tolerance 1mm
 d_tyc17=5.0;           //prumer stredove tyc, tolerance 0.012mm
 d_pod17=22.0;          //prumer podlozky stredove tyc, tolerance 0.05mm
@@ -152,7 +154,7 @@ h_ALTpod17 = Uhlopricka_drzakLaser/2 + tol_h_drzakLaser - a_mot17/2;
    
 }
 
-//OSY M5
+//SROUBY M5
 {
 M5_screw_lenght=20;           //delka sroubu
 M5_screw_diameter=5.5;        //prumer sroubu (zavit)
@@ -222,21 +224,39 @@ Hloubka_loziskaALT_Laser= t_ALT/2 + h_Loz/2 + 0.1;  //ALT osa, ALT cast
 
 
 
-//SROUBEK
-module sroubek(delka = 10){
+//sroubekM3
+module sroubekM3(delka = 10){
    
-    translate([0, 0, -3]) 
-    cylinder(d=5.5, h = 3, $fn=20);         //hlava sroubu
-    cylinder(h = delka, d = 3, $fn=20);     //telo sroubu
+    translate([0, 0, -M3_screw_head_height]) 
+    cylinder(d = M3_screw_head_diameter, h = M3_screw_head_height);         //hlava sroubu
+    cylinder(d = M3_screw_diameter, h = delka);     //telo sroubu
     
 }
 
 
-//MATKA
-module matka(){
+//sroubekM5
+module sroubekM5(delka = 20){
+   
+    translate([0, 0, -M5_head_height]) 
+    cylinder(d = M5_head_diameter, h = M5_head_height);    //hlava sroubu
+    cylinder(d = M5_screw_diameter, h = delka);     //telo sroubu
+    
+}
+
+
+//MATKA_M3
+module matka_M3(){
     difference() {
     cylinder(d=M3_nut_diameter, h=M3_nut_height, $fn=6, center=true);   //matka
     cylinder(d=M3_screw_diameter, h=M3_nut_height+0.2, center=true);    //otvor
+    }
+}
+
+//MATKA_M5
+module matka_M5(){
+    difference() {
+    cylinder(d=M5_nut_diameter, h=M3_nut_height, $fn=6, center=true);   //matka
+    cylinder(d=M5_screw_diameter, h=M5_nut_height+0.2, center=true);    //otvor
     }
 }
 
@@ -312,16 +332,19 @@ module AZ_cast() {
 }
     
 module AZ() {
-//    difference() {          //REZ AZ NOHAMI
+   difference() {          
         union() {
   /*          translate([Teziste + a_AZkol/6,0,0]) {      //priblizny posun do centra podlozky i s uvahou teziste soustavy
                 translate([a_AZkol/6,0,0]) {   //posun do teziste cele soustavy pri pomeru hmotnosti 1:2 
   */                
-            translate([0,0,t_AZ*1])
+            translate([0,0,t_AZ])
             scale([2,2,1])
             color("LightBlue")
             AZ_cast();
-            translate([0,0,0])
+            translate([0,0,-t_AZ])
+            scale([2,2,1])
+            color("LightBlue")
+            AZ_cast();
             for(rot=[1:3])
                 rotate([rot*120,90,180])    
                     translate([0,0,-2.5*D/3])   //posun tri dilu do stredu
@@ -342,16 +365,25 @@ module AZ() {
                 Vnohy();
                 translate([0,0,-h_Vnohy*(1/2)])
                     Mnohy();
-                       } 
-    
-//    color("Red")
-//        cylinder(d=M5_screw_diameter, h=Posun_ALT*2 + 30, center=true);
- //   color("Grey")
- //   translate([a_AZkol, 0, 0]) 
- //       cylinder(d=d_tyc17*2, h=t_AZ*1.1, center=true);
- //       }
+                       }
+        #for(rot_i=[1:3])
+            for(rot_j=[1:2])
+                rotate([rot_i*120+(rot_j*30+15)+60,270,0])    
+                    translate([-t_AZ,0,-D*2])   
+                        rotate([0,90,0]) {
+                            sroubekM5(30);
+                            translate([0,0,t_AZ*2.5]) 
+                                matka_M5();
+                           }
+/*      
+        color("Red")
+        cylinder(d=M5_screw_diameter, h=Posun_ALT*2 + 30, center=true);
+        color("Grey")
+        translate([a_AZkol, 0, 0]) 
+        cylinder(d=d_tyc17*2, h=t_AZ*1.1, center=true);
+*/
 }
-
+}
 //MOTOR
 module motor() {
     color("OrangeRed") {
@@ -509,9 +541,9 @@ translate([200,0,0]) {
             rotate([rot*90+45,90,0])
                 translate([0,0, a_mot17/2 * sqrt(2) + t_ulozLaser*1.5])
                     rotate([0,90,0]) {
-                        sroubek(16);
+                        sroubekM3(16);
                         translate([0,0,16-M3_nut_height-1])
-                        matka();
+                        matka_M3();
                     }
     translate([0,0,h_mot17/2+t_ulozLaser+0.1])
         ulozeni_motoru_vicko();
@@ -550,7 +582,7 @@ module ulozeni_loziskaAZ_sroub() {
     }
 }
 
-module ulozeni_loziskaAZ_matka() {
+module ulozeni_loziskaAZ_matka_M3() {
     difference() {
         
     cylinder(d1=D_ulozAZ_Loz,d2=D_Loz,h=h_Loz*2, center=true);
@@ -591,8 +623,25 @@ module Mkolo() {
 
 //ALT cast
 module ALT() {
+    difference() {
     color("DeepSkyBlue")                    
     cube([a_ALT,b_ALT,t_ALT], center=true);     //vodorvna cast
+    
+    rotate([90,0,0])
+     translate([-a_ALT/2 + h_mot17/2 + tol_a_pod17/2, 0, 0])
+   
+            rotate([-90,0,0]) 
+                #for(rot=[1:2]) 
+                    for(i=[1:2])
+                        rotate([0,0,rot*180])
+                        translate([U_a_pod17*(-1)^i, U_b_pod17, h_ALTpod17/2 ]){
+                        
+                            translate([0,0,-h_ALTpod17/2 - t_ALT/2 +1])
+                                sroubekM3(delka=40);
+                           
+                        }
+                    }
+                   
    /* difference() {
         cylinder(d=M5_nut_diameter*2, h=t_ALT + M5_nut_height*2, center=true);
         cylinder(d=M5_nut_diameter, h=t_ALT + M5_nut_height*3, $fn=6, center=true);
@@ -645,10 +694,10 @@ module drzak_Laseru() {
                 translate([-t_podLaser/2 - M3_nut_height/2 + posun_matkaLaser, a_Laser/2 - M3_screw_head_diameter, h_Laser/2 - M3_screw_head_diameter])
                     rotate([0,90,0]) {
                         translate([0,-a_Laser + M3_screw_head_diameter*2,0]) {
-                            matka(); 
+                            matka_M3(); 
                             cylinder(d=M3_screw_diameter,h=delka_sroubu_podLaser*2, center=true);
                             }
-                        matka(); 
+                        matka_M3(); 
                         cylinder(d=M3_screw_diameter,h=delka_sroubu_podLaser*2, center=true);
                         }
          }
@@ -680,7 +729,7 @@ AZ();
         translate([0,0, Hloubka_loziskaAZ + 10])
                 ulozeni_loziskaAZ_sroub();
     translate([0,0, Hloubka_loziskaAZ + 10])
-            ulozeni_loziskaAZ_matka();
+            ulozeni_loziskaAZ_matka_M3();
 }*/
 
 //AZ MOTOR + KOLA
@@ -754,11 +803,11 @@ translate([0,0,0]) {
                 ulozeni_loziskaAZ_sroub();
             rotate([180,0,0])
                 translate([0,0, h_ulozLoz/2+t_ALT/2])
-                    ulozeni_loziskaAZ_matka();
+                    ulozeni_loziskaAZ_matka_M3();
        }   
    }*/
 
-//ALT motor
+//ALT motor + podlozka
  translate([0 ,0, 0 ]){
     rotate([90,0,0])
      translate([-a_ALT/2 + h_mot17/2 + tol_a_pod17/2, 0, 0])
@@ -778,14 +827,16 @@ translate([0,0,0]) {
             
             translate([0,Posun_ALT,0])
             rotate([-90,0,0]) 
-                for(rot=[1:2]) 
+                #for(rot=[1:2]) 
                     for(i=[1:2])
                         rotate([0,0,rot*180])
                         translate([U_a_pod17*(-1)^i, U_b_pod17, h_ALTpod17/2 ]){
                         
-                            translate([0,0,-14])
-                                sroubek(delka=35);
-                            cylinder(d=M3_screw_diameter, h=h_ALTpod17*2, center=true);
+                            translate([0,0,-h_ALTpod17/2 - t_ALT/2 +1])
+                                sroubekM3(delka=40);
+                            translate([0,0,h_ALTpod17/2 + t_ALTpod17/2])
+                                matka_M3();
+                            
                         }
                         
 }
