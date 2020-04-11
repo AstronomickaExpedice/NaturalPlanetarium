@@ -168,7 +168,7 @@ h_podLaser=h_Laser + 10;        //vyska drzaku Laseru + uchyt sroubu
 
 //AZ cast hodnoty
 {
-//cela AZ podlozka navrzena funkci hull    
+//cela AZ cast navrzena funkci hull    
 A=a_mot17*(11/36);               //vzdalenost od stredu kruhu tvoricich AZ cast
 D=A;                //prumer kruhu tvoricich AZ cast
 /*V=A*1.5;
@@ -287,8 +287,8 @@ module Mnohy() {
                     }
 }
 
-//AZ podlozka
-module AZ_podlozka() {
+//AZ cast
+module AZ_cast() {
     hull() {
         for(rot=[1:3])
             rotate([rot*120,90,0])
@@ -300,7 +300,7 @@ module AZ_podlozka() {
 
 
     
-//AZ podlozka
+//AZ cast
 module AZ() {
     difference() {          //REZ AZ NOHAMI
         union() {
@@ -310,7 +310,7 @@ module AZ() {
             translate([0,0,50])
             scale([1.5,1.5,1])
             color("LightBlue")
-            AZ_podlozka();
+            AZ_cast();
                     translate([0,0,0])
                     for(rot=[1:3])
                         rotate([rot*120,90,180])    
@@ -320,10 +320,10 @@ module AZ() {
                                     rotate([0,180,0])   //vzajemne otoceni trojuhelniku...
                                         translate([0,0,0])
                                             scale([1.2*(1/3),1.2,1])
-                                                AZ_podlozka();
+                                                AZ_cast();
                                     translate([Posun_AZmot/2+a_mot17/2+D*1.7,0,0])
                                             scale([1.2*(1/3),1.2,1])
-                                           AZ_podlozka();
+                                           AZ_cast();
                                           // #cylinder(d=a_mot17,h=t_AZ, center=true);
                                    }
                                 }
@@ -349,7 +349,7 @@ module AZ() {
 }
 
 /*
-//AZ podlozka
+//AZ cast
 module AZ() {
     difference() {          //REZ AZ NOHAMI
         union() {
@@ -359,7 +359,7 @@ module AZ() {
  /*           translate([0,0,50])
             scale([1.5,1.5,1])
             color("LightBlue")
-            AZ_podlozka();
+            AZ_cast();
                     translate([0,0,0])
                     for(rot=[1:3])
                         rotate([rot*120,90,180])    
@@ -369,10 +369,10 @@ module AZ() {
                                     rotate([0,180,0])   //vzajemne otoceni trojuhelniku...
                                         translate([0,0,0])
                                             scale([1.2*(1/3),1.2,1])
-                                                AZ_podlozka();
+                                                AZ_cast();
                                     translate([Posun_AZmot/2+a_mot17/2,0,0])
                                             scale([1*(14/25),1.2,1])
-                                         AZ_podlozka();
+                                         AZ_cast();
                                    }
                                 }
 /*    //nozicky
@@ -490,7 +490,7 @@ module Mkolo() {
     cylinder(d=d_Mkolo,h=t_kolo, center=true);
 }
 
-//AZ podlozka
+//AZ cast
 AZ();
 translate([0,0,0]) {
 /*    translate([0,0, Hloubka_loziskaAZ])
