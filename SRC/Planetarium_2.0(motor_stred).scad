@@ -18,7 +18,8 @@ X    ALT - BOCNICE + ZEBRO
 delka_sroubuLoz=16;
 delka_sroubu_Vnohy=10;
 delka_sroubu_podLaser=10;
-delka_sroubu=10;   
+delka_sroubu=10;  
+delka_sroubuL_drzak=10; 
 }
 
 /* pred tiskem celeho modelu
@@ -209,7 +210,8 @@ Posun_drzakLaser= Posun_ALT + Uhlopricka_drzakLaser/2 + t_ALT/2 + tol_h_drzakLas
 Posun_podLaser=5;
 PosunALT_Vkolo=10;
 posun_matkaLaser=1.5;
-Posun_nohou=A+D/6+Prodlouzeni_AZ;    
+Posun_nohou=A+D/6+Prodlouzeni_AZ;
+Posun_uchytM3 = M3_screw_diameter*1.2 + t_podLaser/2;   //uchyceni sroubu (drzak laseru) oproti podlozce    
     
 U_a_pod17=a_ALTpod17/2 - tol_a_pod17/3;     //Vzdalenost nohou podlozky Laseru ve smeru a
 U_b_pod17=b_ALTpod17/2 - tol_b_pod17/3;     //Vzdalenost nohou podlozky Laseru ve smeru b
@@ -738,16 +740,32 @@ module drzak_Laseru() {
             color("SlateBlue")
             cube([a_Laser,t_podLaser,h_Laser], center=true);
             color("LightBlue")
-            rotate([90,0,0]) {
-                intersection() {
-                ulozeni_M5();
-                rotate([0,180,0])
-                ulozeni_M5();
-                }
-            }
-            }
+            difference() {    
+                hull() {
+                    rotate([90,0,0])
+                    translate([0,0,Posun_uchytM3]) {
+                        cylinder(d=d_tyc17*2, h=M3_screw_diameter*3, center=true);
+                        rotate([0,90,0])
+                        translate([0,0,-delka_sroubuL_drzak])
+                            cylinder(d=M3_screw_diameter*3, h=delka_sroubuL_drzak/2, center=true);
+                            }
+                    }
+                rotate([0,90,0])
+                translate([0 ,-Posun_uchytM3, -delka_sroubuL_drzak ]) 
+                    sroubek_M3(delka_sroubuL_drzak);
+                    translate([-delka_sroubuL_drzak/2 ,-Posun_uchytM3,0 ])
+                    rotate([0,90,0])
+                        #hull() {
+                            matka_M3();
+                            
+                            translate([M3_nut_diameter,0,0])    
+                                matka_M3();
+                    
+                        }
+                 
+            }}
         rotate([90,0,0])    
-        cylinder(d=M5_screw_diameter, h=100, center=true);
+            cylinder(d=d_tyc17+tol_d_tyc17/2, h=100, center=true);
         for(rot=[1:2])
             rotate([rot*180,0,90])
                 translate([-t_podLaser/2 - M3_nut_height/2 + posun_matkaLaser, a_Laser/2 - M3_screw_head_diameter, h_Laser/2 - M3_screw_head_diameter])
@@ -763,10 +781,10 @@ module drzak_Laseru() {
 }
 
 //LASER
-module Laser() {
-    color("LightSalmon")
-    cube([a_Laser,a_Laser,h_Laser], center=true);
-}
+//module Laser() {
+ //   color("LightSalmon")
+ //   cube([a_Laser,a_Laser,h_Laser], center=true);
+//}
 
 
 
@@ -900,7 +918,7 @@ translate([0,0,0]) {
 }
 
 //LASER
-translate([a_ALT/10, 0,Posun_drzakLaser]) {
+translate([0, 0,Posun_drzakLaser]) {
 rotate([0,0,90]){
 drzak_Laseru();
 /*Loziska drzak Laseru
@@ -921,9 +939,9 @@ translate([0, 0, 0]) {
        }   
    }   
 */
-rotate([0,0,180])
+/*rotate([0,0,180])
 translate([0,a_ALT*(1/4) ,0])
-Laser();
+Laser();*/
 }
 
 }
