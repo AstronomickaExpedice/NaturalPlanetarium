@@ -137,9 +137,12 @@ h_podMnohy=3;               //prumer podlozky vnitrnich nohou
 
 //Podlozka AZ/ALT NEMA17
 {
+h_podAZ17=10;    
+    
 a_17podl=a_mot17 + 2;           //sirka a delka (xy) podlozky+tolerance
 h_17podl=M3_screw_head_height + M3_screw_lenght - h_otvor17 - t_podlozky + 5;    //prostor pod podlozkou pro ulozeni sroubu+tolerance
 H_17ulozeni=h_mot17 + 2*t_podlozky + 2;     //vyska boxu podlozky na motor+tolerance
+    
 }
 
 //ALT cast
@@ -198,7 +201,7 @@ Prodlouzeni_AZ=5*D;             //vzdalenost od stredu trojuhelniku tvoricich sp
 //POSUNY
 {
 //tyto posuny jsou pouze kvuli prohlizeni modelu jako celku
-Posun_perspektivy=0;               //osa z 
+Posun_perspektivy=10;               //osa z 
 Posun_ALT=70;                       //osa z
 Posun_perspektivy_motor=50;
 Posun_AZkol=20;
@@ -345,19 +348,54 @@ module AZ() {
   /*          translate([Teziste + a_AZkol/6,0,0]) {      //priblizny posun do centra podlozky i s uvahou teziste soustavy
                 translate([a_AZkol/6,0,0]) {   //posun do teziste cele soustavy pri pomeru hmotnosti 1:2 
   */                
-            scale([2,2,1])
+           scale([2,2,1])
                 color("LightBlue") {
                     translate([0,0,t_AZ])
                         AZ_cast();
-                    translate([0,0,-t_AZ])
+                   translate([0,0,-t_AZ])
                         AZ_cast();
                     }
-          //  translate([0,0,10]){
-          //      scale([1.2,1.2,1])
-            //        AZ_cast();
-                  //  translate([0,0,30])
-                 //   motor();
-            //}  
+            translate([0,0,t_AZ*2+h_podAZ17]){
+                scale([1,1,1]){
+                    /*difference() {
+                        AZ_cast();
+                        scale([0.85,0.85,1.1])
+                            AZ_cast();
+                            
+                        }*/
+                     translate([D/4,0,0])
+                     difference() {   
+                        cube([a_mot17, a_mot17, t_AZ], center=true);
+                        scale([0.8,0.8,1.1]){
+                            cube([a_mot17, a_mot17, t_AZ], center=true);
+                        }
+//otvory na srouby motoru
+                        
+                        }
+                        translate([D/3-1.5,0,0])
+                            for(rot=[1:4])
+                            rotate([rot*90+45,90,0])
+                                translate([0,0,a_rozvor17/2*sqrt(2)])
+                                    rotate([0,90,0])
+                                        cylinder(d=d_otvor17*2,h=t_AZ, center=true);
+                }
+//nohy podlozky                
+                    for(rot=[1:3])      
+                        rotate([rot*120,90,0])    
+                            translate([0,0,D*(4/3)+0.5])   //posun tri dilu do stredu
+                                rotate([0,90,0]) 
+                                {
+                                    translate([0,0,0])
+                                    cylinder(d=4*1.5,h=t_AZ,center=true);
+                                translate([0,0,7.5])
+                                    cylinder(d=4,h=10,center=true);
+                                translate([-5,0,11])
+                                    scale([2,1,1])
+                                    cylinder(d=D/2,h=3, center=true);
+                                }}
+                  /* translate([0,0,30])
+                    motor();*/
+             
 //PRODLOUZENE CASTI                    
             for(rot=[1:3])
                 rotate([rot*120,90,180])    
@@ -374,21 +412,38 @@ module AZ() {
                                   // #cylinder(d=a_mot17,h=t_AZ, center=true);
                            }
                         }
+                        
 //NOZICKY
            
                 Vnohy();
                 translate([0,0,-h_Vnohy*(1/2)])
                     Mnohy();
                        }
+            #translate([D/3-1.5,0,20])
+                            for(rot=[1:4])
+                            rotate([rot*90+45,90,0])
+                                translate([0,0,a_rozvor17/2*sqrt(2)])
+                                    rotate([0,90,0])
+                                        cylinder(d=d_otvor17,h=10, center=true);
+
 //OTVORY SROUBY A MATKY
-        #for(rot_i=[1:3])
+        for(rot_i=[1:3])
             for(rot_j=[1:2])
-                rotate([rot_i*120+(rot_j*30+15)+60,270,0])    
-                    translate([t_AZ,0,-D*2.2])   
+                rotate([rot_i*120+(rot_j*70)+15,270,0])    
+                    translate([t_AZ,0,-D*1.3])   
                         rotate([180,90,0]) {
                             sroubekM5(30);
                             translate([0,0,t_AZ*2.5]) 
                                 matka_M5();
+                           }
+        for(rot_i=[1:3])
+          //  for(rot_j=[1:2])
+                rotate([rot_i*120,270,0])    
+                    translate([t_AZ*1.75,0,-D*1.8])   
+                        rotate([180,90,0]) {
+                            sroubekM3(30);
+                            translate([0,0,t_AZ*3.25]) 
+                                matka_M3();
                            }
 /*      
         color("Red")
@@ -410,6 +465,13 @@ module motor() {
     }         
     color("Orange")                             //otvory na srouby
     translate([0,0,+h_mot17/2-h_otvor17/2+0.1])
+        for(rot=[1:4])
+            rotate([rot*90+45,90,0])
+                translate([0,0,a_rozvor17/2*sqrt(2)])
+                    rotate([0,90,0])
+                        cylinder(d=d_otvor17,h=h_otvor17, center=true);
+    color("Orange")                             //otvory na srouby
+    translate([0,0,-h_mot17/2+h_otvor17/2-0.1])
         for(rot=[1:4])
             rotate([rot*90+45,90,0])
                 translate([0,0,a_rozvor17/2*sqrt(2)])
@@ -757,6 +819,7 @@ module Laser() {
 
 /////////////////////////////////////////////////////////////
 //AZ cast
+translate([-D/4,0,0])
 AZ();
 /*translate([0,0,0]) {
     translate([0,0, Hloubka_loziskaAZ])
