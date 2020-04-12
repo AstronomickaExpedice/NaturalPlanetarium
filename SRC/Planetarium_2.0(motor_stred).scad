@@ -798,7 +798,7 @@ module drzak_Laseru() {
         rotate([90,0,0])    
             cylinder(d=d_tyc17+tol_d_tyc17/2, h=100, center=true);
         
-//OTVORY SROUBY - PODLOZKA LASERU  
+/*//OTVORY SROUBY - PODLOZKA LASERU  
         for(rot=[1:2])
             rotate([rot*180,180,90])
                 translate([-t_podLaser/2 - M3_nut_height/2 + posun_matkaLaser, a_Laser/2 - M3_screw_head_diameter, h_Laser/2 - M3_screw_head_diameter])
@@ -809,7 +809,23 @@ module drzak_Laseru() {
                             }
                         matka_M3(); 
                         cylinder(d=M3_screw_diameter,h=delka_sroubu_podLaser*2, center=true);
-                        }
+                        }*/
+//OTVORY SROUBY + MATKY
+       # translate([-1.4,-26,1.5])
+            rotate([270,0,0]) 
+                for(rot=[1:2]) 
+                    for(i=[1:2])
+                        rotate([0,0,rot*180])
+                            translate([U_a_pod17*(-1)^i, U_b_pod17, h_ALTpod17/2 ]){
+                                translate([0,0,-h_ALTpod17/2 - t_ALT/2 +1])
+                                    sroubek_M3(delka=35);
+                                translate([0,0,h_ALTpod17/2 + t_ALTpod17/2])
+                                    hull() {
+                                        matka_M3();
+                                        translate([0,0,M3_nut_height])  //ULOZ. MATKY
+                                            matka_M3();
+                                        }
+                                }
          }
 }
 
@@ -840,7 +856,7 @@ module pod_Laser() {
 
                 
 //OTVORY SROUBY + MATKY
-       # translate([0,0,h_ALTpod17])
+       #translate([0,0,h_ALTpod17])
             rotate([180,0,0]) 
                 for(rot=[1:2]) 
                     for(i=[1:2])
