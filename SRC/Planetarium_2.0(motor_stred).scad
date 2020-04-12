@@ -766,7 +766,7 @@ module drzak_Laseru() {
     difference() {
         union() {
             color("SlateBlue")      //zakladni cast
-            cube([a_Laser,t_podLaser,h_Laser], center=true);
+            cube([a_Laser+15,t_podLaser,h_Laser], center=true);
             color("LightBlue")
             difference() { 
 //UPEVNENI ALT OSY   
@@ -812,6 +812,53 @@ module drzak_Laseru() {
                         }
          }
 }
+
+//PODLOZKA LASERU
+module pod_Laser() {
+    difference() {
+        union() {
+            cube([h_Laser+10, a_Laser+15, t_podLaser], center=true);    //vodorovna cast
+            translate([h_Laser/2 +2.5 , 0, -a_mot17/2 - t_ALTpod17/2])
+                difference() {          //SVISLA CAST
+                    cube([t_ALTpod17,b_ALTpod17,a_mot17], center=true);     //svisla cast
+                    /*translate([t_ALTpod17/2-M3_screw_head_height/2,0,0])
+                        for(rot=[1:4])
+                            rotate([rot*90+45,0,0])
+                                translate([0,0,a_rozvor17/2*sqrt(2)])
+                                    rotate([0,90,180])
+                                        sroubek_M3();    //otvory sroubu (svisla cast)*/
+                    }
+            
+//NOHY PODLOZKY 
+            for(rot=[1:2])
+                for(i=[1:2])
+                    rotate([0,0,rot*180])
+                        translate([U_a_pod17*(-1)^i, U_b_pod17, h_ALTpod17/4 ])
+                            cylinder(d=M3_screw_diameter*2.5, h=h_ALTpod17/2, center=true);
+             }
+             
+
+                
+//OTVORY SROUBY + MATKY
+       # translate([0,0,h_ALTpod17])
+            rotate([180,0,0]) 
+                for(rot=[1:2]) 
+                    for(i=[1:2])
+                        rotate([0,0,rot*180])
+                            translate([U_a_pod17*(-1)^i, U_b_pod17, h_ALTpod17/2 ]){
+                                translate([0,0,-h_ALTpod17/2 - t_ALT/2 +1])
+                                    sroubek_M3(delka=35);
+                                translate([0,0,h_ALTpod17/2 + t_ALTpod17/2])
+                                    hull() {
+                                        matka_M3();
+                                        translate([0,0,M3_nut_height])  //ULOZ. MATKY
+                                            matka_M3();
+                                        }
+                                }
+    }    
+}
+
+
 
 //LASER
 module Laser() {
@@ -973,9 +1020,11 @@ translate([0, 0, 0]) {
    }   
 
 rotate([0,0,-90])
-translate([0,a_ALT*(2/7) ,0])
+translate([0,a_ALT*(2/7)+1 ,0])
 Laser();
-
+rotate([0,90,180])
+translate([0,0,-15])
+pod_Laser();
 
 }
 
