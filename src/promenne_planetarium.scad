@@ -1,7 +1,6 @@
 //PROMENNE PLANETARIUM
 
-//PLANETARIUM
-$fn=100;
+z_promennych = "Tohle je text ze souboru s parametry";
 
 
 //DELKY SROUBU
@@ -9,36 +8,36 @@ $fn=100;
 delka_sroubuLoz=16;
 delka_sroubu_Vnohy=10;
 delka_sroubu_podLaser=10;
-delka_sroubu=10;  
+delka_sroubu=10;
 delka_sroubuL_drzak=20;
-delka_sroubu_AZosa=20; 
+delka_sroubu_AZosa=20;
 }
 
 
 //TOLERANCE
 {
 tol_sten=0.5;           //tolerance sten pri ulozeni motoru a laseru
-tol_nohy=1;             //tolerance sten pri ulozeni nohou 
-    
+tol_nohy=1;             //tolerance sten pri ulozeni nohou
+
 tol_h_sroubLoz=2;
 tol_h_sroub17=2;
 tol_h_sroub=2;
 tol_h_sroubLaser=2;
 tol_h_sroubAZosa=2;
-    
+
 tol_h_drzakLaser=10;
 tol_b_pod17=15;
 tol_a_pod17=15;
-    
+
 tol_h_podT17=1;
-tol_d_podT17=1; 
+tol_d_podT17=1;
 tol_d_tyc17=1;
 tol_h_tyc17=1;
 
-tol_h_matka=1; 
- 
+tol_h_matka=1;
+
 tol_otocLaser=5;
-    
+
 }
 
 //SROUBY M3
@@ -51,8 +50,8 @@ M3_screw_head_height=3;       //vyska hlavy sroubu
 M3_nut_pocket=5.6;
 M3_screw_head_diameter=6.6;           //prumer hlavy sroubu
 
-h_otvor_sroub=8;           //delka otvoru pro sroub 
-        
+h_otvor_sroub=8;           //delka otvoru pro sroub
+
 }
 
 //MOTOR NEMA 17
@@ -113,13 +112,13 @@ d_Mkolo=30;      //prumer maleho kola
 {
 a_AZ=d_Vkolo + a_mot17;         //sirka (x) AZ casti
 b_AZ=d_Vkolo;                   //delka (y) AZ casti
-    
+
 h_Vnohy=20;                      //vyska vnejsich nohou
 d_Vnohy=11;                     //prumer vnejsich nohou
-    
+
 h_Mnohy=h_Vnohy-tol_nohy*2;     //vyska vnitrnich nohou
 d_Mnohy=d_Vnohy-t_Vnohy-tol_nohy; //prumer vnitrnich nohou
-    
+
 d_podMnohy=d_Vnohy+10;      //vyska podlozky vnitrnich nohou
 h_podMnohy=3;               //prumer podlozky vnitrnich nohou
 
@@ -143,15 +142,15 @@ h_ALT=Uhlopricka_drzakLaser+10;                         //vyska (z) ALT casti
 
 //ALT podlozka motoru
 {
-d_ALT_ulozT17=d_tyc17*2;    
+d_ALT_ulozT17=d_tyc17*2;
 d_AZ_ulozT17=d_tyc17*2;
 Posun_drzak_AZmot=(d_AZ_ulozT17-d_tyc17);
 
 a_ALTpod17 = h_mot17 + tol_b_pod17;
 b_ALTpod17 = a_mot17 + tol_b_pod17;
-t_ALTpod17 = d_tyc17 + Posun_drzak_AZmot; 
+t_ALTpod17 = d_tyc17 + Posun_drzak_AZmot;
 h_ALTpod17 = Uhlopricka_drzakLaser/2 + tol_h_drzakLaser - a_mot17/2;
-   
+
 }
 
 //SROUBY M5
@@ -170,7 +169,7 @@ M5_head_diameter=13 + 0.5;  //prumer hlavy sroubu
 
 //AZ cast hodnoty
 {
-//cela AZ cast navrzena funkci hull    
+//cela AZ cast navrzena funkci hull
 A=a_mot17*0.4;               //vzdalenost od stredu kruhu tvoricich AZ cast
 D=A;                //prumer kruhu tvoricich AZ cast
 
@@ -180,7 +179,7 @@ Prodlouzeni_AZ=5*D;             //vzdalenost od stredu trojuhelniku tvoricich sp
 //POSUNY
 {
 //tyto posuny jsou pouze kvuli prohlizeni modelu jako celku
-Posun_perspektivy=0;               //osa z 
+Posun_perspektivy=0;               //osa z
 Posun_ALT=h_mot17 + t_AZ*1.5;                      //osa z
 Posun_perspektivy_motor=50;
 Posun_AZkol=20;
@@ -193,13 +192,13 @@ Posun_podLaser=5;
 PosunALT_Vkolo=10;
 posun_matkaLaser=1.5;
 Posun_nohou=A+D/6+Prodlouzeni_AZ;
-Posun_uchytM3 = M3_screw_diameter*1.2 + t_podLaser/2;   //uchyceni sroubu (drzak laseru) oproti podlozce    
-    
+Posun_uchytM3 = M3_screw_diameter*1.2 + t_podLaser/2;   //uchyceni sroubu (drzak laseru) oproti podlozce
+
 U_a_pod17=a_ALTpod17/2 - tol_a_pod17/3;     //Vzdalenost nohou podlozky Laseru ve smeru a
 U_b_pod17=b_ALTpod17/2 - tol_b_pod17/3;     //Vzdalenost nohou podlozky Laseru ve smeru b
 
 a_AZkol=Posun_AZmot/2+a_mot17/2 +10;        //vzdalenost osy AZ a stredu motoru AZ
-    
+
 D_ulozAZ_Loz=D_Loz*3;
 h_ulozLoz=h_Loz*2;
 
@@ -220,21 +219,21 @@ Hloubka_loziskaALT_Laser= t_ALT/2 + h_Loz/2 + 0.1;  //ALT osa, ALT cast
 
 //sroubek_M3
 module sroubek_M3(delka = 10){
-   
-    translate([0, 0, -M3_screw_head_height]) 
+
+    translate([0, 0, -M3_screw_head_height])
     cylinder(d = M3_screw_head_diameter, h = M3_screw_head_height);         //hlava sroubu
     cylinder(d = M3_screw_diameter, h = delka);     //telo sroubu
-    
+
 }
 
 
 //sroubek_M5
 module sroubek_M5(delka = 20){
-   
-    translate([0, 0, -M5_head_height]) 
+
+    translate([0, 0, -M5_head_height])
     cylinder(d = M5_head_diameter, h = M5_head_height);    //hlava sroubu
     cylinder(d = M5_screw_diameter, h = delka);     //telo sroubu
-    
+
 }
 
 
