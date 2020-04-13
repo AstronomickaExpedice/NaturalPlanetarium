@@ -336,6 +336,8 @@ module Vnohy() {    //vnejsi cast nozicek u AZ casti (pro tisk spojeno s AZ cast
 
 //NOHY VNITRNI
 module Mnohy() {
+    translate([0,0,Posun_STL*1.6])    //STL
+    rotate([0,0,Rotace_STL/2.5])
     color("Orange")
     for(rot=[1:3])
             rotate([rot*120,90,0])
@@ -366,36 +368,20 @@ module AZ() {
   /*          translate([Teziste + a_AZkol/6,0,0]) {      //priblizny posun do centra podlozky i s uvahou teziste soustavy
                 translate([a_AZkol/6,0,0]) {   //posun do teziste cele soustavy pri pomeru hmotnosti 1:2 
   */                
-            scale([2,2,1])
+            rotate([0,0,Rotace_STL*2])
+            translate([-Posun_STL*4.5,0,0])
+                difference() {
+                 scale([2,2,1])   
                 color("LightBlue") {
+                    
                     translate([0,0,t_AZ])
                         AZ_cast();
+                    
                     translate([0,0,-t_AZ])
                         AZ_cast();
                     }
-            
-//PRODLOUZENE CASTI                    
-            for(rot=[1:3])
-                rotate([rot*120,90,180])    
-                    translate([0,0,-2.5*D/3])   //posun tri dilu do stredu
-                        rotate([0,90,0]) {
-                           hull() {
-                            rotate([0,180,0])   //vzajemne otoceni trojuhelniku...
-                                translate([0,0,0])
-                                    scale([1.2*(1/3),1.2,1])
-                                        AZ_cast();
-                            translate([Prodlouzeni_AZ,0,0])
-                                    scale([1,1.2,1])
-                                   AZ_cast();
-                                  // cylinder(d=a_mot17,h=t_AZ, center=true);
-                           }
-                        }
-//NOZICKY
-           
-                Vnohy();
-                translate([0,0,-h_Vnohy*(1/2)])
-                    Mnohy();
-                       }
+                                          //STL
+#union() {                       
 //OTVORY SROUBY A MATKY (M5)
         for(rot_i=[1:3])
             for(rot_j=[1:2])
@@ -422,7 +408,66 @@ module AZ() {
             rotate([rot*90+45,270,0])
                 translate([0,0,a_rozvor17/2*sqrt(2)])
                     rotate([0,90,0])
-                        sroubek_M3(30);                  
+                        sroubek_M3(30);
+    }   }
+            
+//PRODLOUZENE CASTI
+rotate([0,Rotace_STL*2,0])                                //STL    
+     union() {               
+            for(rot=[1:3])
+                rotate([rot*120,90,180])    
+                    translate([0,0,-2.5*D/3])   //posun tri dilu do stredu
+                        rotate([0,90,0]) {
+                           hull() {
+                            rotate([0,180,0])   //vzajemne otoceni trojuhelniku...
+                                translate([0,0,0])
+                                    scale([1.2*(1/3),1.2,1])
+                                        AZ_cast();
+                            translate([Prodlouzeni_AZ,0,0])
+                                    scale([1,1.2,1])
+                                   AZ_cast();
+                                  // cylinder(d=a_mot17,h=t_AZ, center=true);
+                           }
+                        }
+//NOZICKY
+           
+                Vnohy();
+                        }
+                translate([0,0,-h_Vnohy*(1/2)])
+                    Mnohy();
+                    
+                       }
+                       
+rotate([0,Rotace_STL*2,0])                       //STL
+union() {                       
+//OTVORY SROUBY A MATKY (M5)
+        for(rot_i=[1:3])
+            for(rot_j=[1:2])
+                rotate([rot_i*120+(rot_j*30+15)+60,270,0])    
+                    translate([t_AZ,0,-D*2.2+0.5])   
+                        rotate([180,90,0]) {
+                            sroubek_M5(30);
+                            translate([0,0,t_AZ*2.5]) 
+                                matka_M5();
+                           }
+
+//OTVORY SROUBY MOTOR (M3)
+        for(rot_i=[1:3])
+            for(rot_j=[1:2])
+                rotate([rot_i*120+(rot_j*30+15)+60,270,0])    
+                    translate([t_AZ,0,-D*2.2])   
+                        rotate([180,90,0]) {
+                            sroubek_M5(30);
+                            translate([0,0,t_AZ*2.5]) 
+                                matka_M3();
+                           } 
+        translate([0,0,-t_AZ*1.25])
+        for(rot=[1:4])
+            rotate([rot*90+45,270,0])
+                translate([0,0,a_rozvor17/2*sqrt(2)])
+                    rotate([0,90,0])
+                        sroubek_M3(30);
+    }        
                            
 /*      
         color("Red")
@@ -462,6 +507,8 @@ module motor() {
 
 //UCHYT AZ ALT MOTORU
 module uchyt_AZ_ALTmot() {
+    translate([-Posun_STL*2.5,-Posun_STL*3,-Posun_STL])    //STL
+    rotate([Rotace_STL,0,0])
     rotate([0,-90,0])
     difference() {
         union() {
@@ -911,6 +958,9 @@ module drzak_Laseru() {
 
 //PODLOZKA LASERU
 module pod_Laser() {
+    translate([Posun_STL*4.55,-Posun_STL*2.5,Posun_STL*3.5])    //STL
+    rotate([0,-Rotace_STL,0])
+    color("Orange")
     difference() {
         union() {
                 
@@ -1031,8 +1081,8 @@ module soustavaAZ_motorKola() {
 
     rotate([0,0,0])
         union() {
-            translate([-a_AZkol,0, +h_mot17/2+t_AZ/2 + Posun_perspektivy])
-                motor();
+//            translate([-a_AZkol,0, +h_mot17/2+t_AZ/2 + Posun_perspektivy])
+//                motor();
           /*  translate([0,0,Posun_AZkol])
                 Mkolo();   */
         }
@@ -1110,8 +1160,8 @@ translate([0,0,0]) {
             union() {
                 rotate([0,90,0])
                     translate([0,Posun_drzakLaser,0]){
-                        translate([0,0,Posun_drzak_AZmot/2-tol_d_tyc17/2])
-                        motor();
+//                        translate([0,0,Posun_drzak_AZmot/2-tol_d_tyc17/2])
+//                        motor();
                
              //  translate([0, Posun_drzakLaser, 0])
              //       rotate([90,0,0])
@@ -1158,9 +1208,9 @@ translate([0, 0, 0]) {
        }   
    }   */
 
-rotate([0,0,-90])
-translate([0,0,0])
-Laser();
+//rotate([0,0,-90])
+//translate([0,0,0])
+//Laser();
 rotate([0,90,180])
 translate([0,0,a_Laser/2+t_podLaser/2])
 //difference() {
