@@ -1,5 +1,7 @@
 //Soucastky navic
 include<promenne_planetarium.scad>
+include<sroubky_matky.scad>
+
 
 //DELKY SROUBU
 {
@@ -268,9 +270,6 @@ module drzak_Laseru() {
          }
 }
 
-
-
-
 /*
 //VYPOCTY
 h_ALTosa=t_kolo + t_ALT + t_podLaser + mezera_ALTosy*3;
@@ -287,33 +286,4 @@ echo(Posun_AZmot/2 -(a_ALT/4+h_Laser/2));
 echo(sqrt(29)*(33/29));
 echo("vzdalenost AZ motor a AZ osa", Posun_AZmot/2+a_mot17/2);
 echo(Posun_AZmot/2+a_mot17);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}

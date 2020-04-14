@@ -1,4 +1,8 @@
 //motor NEMA17 a Laser
+include<promenne_planetarium.scad>
+include<sroubky_matky.scad>
+
+$fn=100;
 
 //MOTOR
 module motor() {
@@ -32,3 +36,9 @@ module Laser() {
     color("LightSalmon")
     cube([a_Laser,a_Laser,h_Laser], center=true);
 }
+
+/*
+motor();
+translate([-50,0,0])
+Laser();
+*/

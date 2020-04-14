@@ -1,4 +1,8 @@
 //AZ cast
+include<promenne_planetarium.scad>
+include<sroubky_matky.scad>
+
+$fn=100;
 
 //NOHY VNEJSI
 module Vnohy() {    //vnejsi cast nozicek u AZ casti (pro tisk spojeno s AZ casti)

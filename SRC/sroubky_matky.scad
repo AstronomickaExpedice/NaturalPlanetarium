@@ -1,4 +1,6 @@
 //SROUBKY A MATKY (M3 a M5)
+include<promenne_planetarium.scad>
+$fn=100;
 
 //sroubek_M3
 module sroubek_M3(delka = 10) {
@@ -30,3 +32,13 @@ module matka_M5() {
         cylinder(d=M5_screw_diameter, h=M5_nut_height+0.2, center=true);    //otvor
         }
 }
+/*
+translate([10,0,0])
+    sroubek_M3();
+translate([-10,0,0])
+    sroubek_M5();
+translate([0,10,0])
+    matka_M3();
+translate([0,-10,0])
+    matka_M5();
+*/
