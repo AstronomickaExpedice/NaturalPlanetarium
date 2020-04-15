@@ -13,7 +13,7 @@ module pod_Laser() {
             translate([0,0,(h_kuzelLaser)/2+t_podLaser/2]) {
                 difference() {
                     cylinder(d1=d_ALT_ulozT17*2, d2=d_ALT_ulozT17, h=h_kuzelLaser, center=true);
-                    cylinder(d=d_tyc17+tol_d_tyc17, h=h_kuzelLaser, center=true);
+                    cylinder(d=d_tyc17, h=h_kuzelLaser, center=true);
                     }
                 }
             }

@@ -18,7 +18,6 @@ tol_otocLaser=5;
 tol_b_pod17=15;
 tol_a_pod17=15;
 
-tol_d_tyc17=1;
 tol_h_tyc17=1;
 
 tol_h_matka=1;
