@@ -1,7 +1,5 @@
 //PROMENNE PLANETARIUM
 
-z_promennych = "Tohle je text ze souboru s parametry";
-
 
 //DELKY SROUBU
 {
@@ -41,9 +39,9 @@ M3_screw_head_diameter=6.6;           //prumer hlavy sroubu
 {
 //BOKORYS
 h_mot17=45;             //vyska hlavni casti motoru (muze byt v hodnotach 34-48mm nebo 60mm)
-h_tyc17=24.0;           //vyska stredove tyc (podlozka+tyc), tolerance 1mm
-d_tyc17=5.0;           //prumer stredove tyc, tolerance 0.012mm
-d_pod17=22.0;          //prumer podlozky stredove tyc, tolerance 0.05mm
+h_tyc17=24.0;           //vyska stredove tyc (podlozka+tyc)
+d_tyc17=5.0+0.5;           //prumer stredove tyc
+d_pod17=22.0+0.5;          //prumer podlozky stredove tyc
 h_pod17=2;                 //vyska podlozky stredove tyc
 H_mot17=h_mot17+h_tyc17;    //celkova vyska motoru
 //PUDORYS
