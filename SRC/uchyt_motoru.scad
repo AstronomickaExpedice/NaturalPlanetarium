@@ -64,4 +64,4 @@ difference() {
     }
 }
 
-uchyt_AZ_ALTmot();
+//uchyt_AZ_ALTmot();
