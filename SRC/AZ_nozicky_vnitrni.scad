@@ -20,3 +20,12 @@ module tri_Mnohy() {
                     Mnohy();
 }
 
+/*
+rotate([180,0,0]) {
+    Mnohy();
+    translate([30,0,0])
+        Mnohy();
+    translate([-30,0,0])
+        Mnohy();
+}
+*/

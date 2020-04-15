@@ -24,6 +24,7 @@ module AZ_stred_matka() {
 }
 /*
 AZ_stred_sroub();
-translate([0,100,t_AZ*2])
+rotate([180,0,0])
+translate([0,100,0])
     AZ_stred_matka();
 */
